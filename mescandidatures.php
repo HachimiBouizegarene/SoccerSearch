@@ -19,47 +19,53 @@
     
     $lesCandidature = $getCandidature->fetchAll();
 
-    // Définition des dimensions du tableau
-    $lignes = count($lesCandidature);
-    $colonnes = count($lesCandidature[0])/2;
 
-    $getNomClubs = $bdd->prepare('SELECT NomClub FROM clubfoot WHERE IdClub IN (SELECT IdClub FROM candidature)');
-    $getNomClubs->execute();
-    $getNomClubs = $getNomClubs->fetchAll();
-
-    // Génération du tableau
-    $columns = array('Club', 'Nom', 'Prénom', 'Email', 'Numéro de téléphone', 'Age renseigné', 'Annuler');
-
-    echo '<table>';
-    echo '<tr>';
-    foreach ($columns as $column) { //crée les titres de colonnes
-    echo '<th>' . $column . '</th>';
-    }
-    echo '</tr>';
-
-    $row_colors = array('#f6f6f6', '#ffffff'); //permettra d'alterner les couleurs de chaque lignes avec $i et un modulo
-    $i = 0;
-
-    for ($l = 0; $l < $lignes; $l++) {
-        $color = $row_colors[$i % 2];
-        echo '<tr style="background-color: ' . $color . '">';
-        echo '<td>' . $getNomClubs[$l][0] . '</td>';
-        for ($c = 0; $c < $colonnes-1; $c++) {
-            echo '<td>' . $lesCandidature[$l][$c+1] . '</td>';
+    if($getCandidature->rowCount() > 0){
+        // Définition des dimensions du tableau
+        $lignes = count($lesCandidature);
+        $colonnes = count($lesCandidature[0])/2;
+        
+        $getNomClubs = $bdd->prepare('SELECT NomClub FROM clubfoot WHERE IdClub IN (SELECT IdClub FROM candidature)');
+        $getNomClubs->execute();
+        $getNomClubs = $getNomClubs->fetchAll();
+        
+        // Génération du tableau
+        $columns = array('Club', 'Nom', 'Prénom', 'Email', 'Numéro de téléphone', 'Age renseigné', 'Annuler');
+        
+        echo '<table>';
+        echo '<tr>';
+        foreach ($columns as $column) { //crée les titres de colonnes
+        echo '<th>' . $column . '</th>';
         }
-        echo '<td>' . '<p onclick="deleteCandidature(' . $c . ')">Supprimer</p>' . '</td>';
         echo '</tr>';
-        $i++;
+        
+        $row_colors = array('#f6f6f6', '#ffffff'); //permettra d'alterner les couleurs de chaque lignes avec $i et un modulo
+        $i = 0;
+        
+        for ($l = 0; $l < $lignes; $l++) {
+            $color = $row_colors[$i % 2];
+            echo '<tr style="background-color: ' . $color . '">';
+            echo '<td>' . $getNomClubs[$l][0] . '</td>';
+            for ($c = 0; $c < $colonnes-1; $c++) {
+                echo '<td>' . $lesCandidature[$l][$c+1] . '</td>';
+            }
+            echo '<td>' . '<p onclick="deleteCandidature(' . $l . ')">Supprimer</p>' . '</td>';
+            echo '</tr>';
+            $i++;
+        }
+        echo '</table>';
+    }else{
+        echo '<h1 class="appd">Pas de candidatures ..</h1>';
     }
-    echo '</table>';
     ?>
+<div class="newClub"><a href="inscriptionClub.php">Crée mon club : <br> (Nouveau !)<a></div>
 
-    <!-- <script type="text/javascript">
+    <script type="text/javascript">
         function deleteCandidature(ligne){	
             console.log(ligne);
-            <?php ?>
+            <?php //faire la suppression en base de donnée de la candidature en ligne "ligne" ?>
         }
-    </script> -->
+    </script>
 
 </body>
 

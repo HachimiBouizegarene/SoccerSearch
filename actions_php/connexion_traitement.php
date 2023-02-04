@@ -30,5 +30,3 @@ if(isset($_POST['validate'])){//si bouton valider est cliqué
         $errorMSG = 'Veuillez compléter tout les champs';
     }
 }
-
-?>

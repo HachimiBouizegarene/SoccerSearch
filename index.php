@@ -8,12 +8,9 @@
 	require 'actions_php/recupInfoClub.php';
 ?>
 <!-- a faire en PHP
-	améliorer traitement candidature : on peut modifier l'url /!\ on peut ecrire nimporte quoi dans les champs etc 
-	faire fonctionner les filtres dans l'index ou ya la map
+	améliorer traitement candidature : on peut modifier l'url /!\ on peut ecrire nimporte quoi dans les champs etc agemin etc
 	Faire fonctionner le bouton supprimer de la rubrique mescandidatures
-	afficher plus de markers
 	mettre le js dans des fichiers séparer
-	Agemin agemax marchent pas le GET es pas défini
 -->
 <body>
 	<div id="content">
@@ -29,10 +26,11 @@
 					}
 				?>
 				<img src="images/logo_gris.png" alt="soccer search logo" onclick="location.href = 'index.php';">
-				<?php	if(isset($_SESSION['logged']) && $_SESSION['logged'])
-							echo '<a href="actions_php/deconnexion.php">déconnexion</a>';
-						else
-							echo '<a href="connexion.php">se connecter</a>';
+				<?php
+					if(isset($_SESSION['logged']) && $_SESSION['logged'])
+						echo '<a href="actions_php/deconnexion.php">déconnexion</a>';
+					else
+						echo '<a href="connexion.php">se connecter</a>';
 				?>
 			</div>
 			<div id="txt_ban">Trouves le club qui te conviens dès aujourd’hui</div>
@@ -42,16 +40,20 @@
 		</div>
 		<div id="search_club">
 			<div id="title_rcu">Rechercher un club</div>
-			<input id="in1"></input>
+			<input type="text" id="in1" placeholder="Rechercher un marqueur"></input>
 			<div id="filtre">
 				<div id="Tranche_dage">
+					<!-- Filtre Clubs Complets-->
+					<label for="filtreClubComplet">Ne pas afficher les clubs complets :</label>
+						<input type="checkbox" id="filtreClubComplet" name="filtreClubComplet" value="false">
+					<!-- Filtre Tranche d'age -->
 					<label for="ageRangeSelect">Tranche d'âge :</label>
-					<select id="ageRangeSelect">
-					<option value="0, 100">-</option>
-					<option value="6,12">6 - 12 ans</option>
-					<option value="13,17">13 - 17 ans</option>
-					<option value="18,45">+ 18 ans</option>
-					</select>
+						<select id="ageRangeSelect">
+							<option value="0, 100">-</option>
+							<option value="6,12">6 - 12 ans</option>
+							<option value="13,17">13 - 17 ans</option>
+							<option value="18,45">+ 18 ans</option>
+						</select>
 				</div>
 				<h1 id="DEBUG"></h1>
 			</div>
@@ -64,48 +66,20 @@
 			// Afficher la MAP
 			var map = L.map('mapid').setView([48.88, 2.33], 10.5);
 			L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=zXWma8gDUYjZyNg2h6Y5', {attribution :'<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',}).addTo(map);
-			
-			
-			let Les_marqueurs = [];
-			// document.getElementById('DEBUG').textContent = Les_marqueurs[1];
-
 
 			function ajaxPlacerMarqueurs(ageMin, ageMax){
-				<?php
-				echo 'let url; let data;';
-				foreach($clubs as $club): ?>
+				
+				<?php foreach($clubs as $club): ?>
 					if(ageMax > <?php echo $club['age'] ?> && <?php echo $club['age'] ?> > ageMin){
-						if(!Les_marqueurs.includes(parseInt(<?php echo $club['IdClub'] ?>))) {
-							// document.getElementById('DEBUG').textContent = '';
-				<?php
-						echo 'url = "https://us1.locationiq.com/v1/search";
-						data = "key=pk.f6fa35e331b50cb86b98353c9410c66e&q=' . $club['Adresse'] . '&format=json";';
-						echo '$.ajax({
-							type: "GET",
-							dataType: "JSON",
-							url: url,
-							data:data,
-							error: function(){console.log("pb in .ajax");}, 
-							success: function(result){'; ?>
-								Les_marqueurs.push(parseInt(<?php echo $club['IdClub']; ?>));
-							<?php 
-								echo 'Marqueur_bdd= L.marker([result[0].lat, result[0].lon]).addTo(map).bindPopup("';
-								echo $club['NomClub'] . '<br> Age minimal : ' .
-								$club['age'] . '<br> Adresse :' .
-								$club['Adresse'] . '<br> Complet : ';
-								if($club['Nbr_adh_max'] - $club['Nbr_adh'] <= 0){
-									echo'Oui <br>';
-								}
-								else{
-									echo'Non <br>';
-								}
-								echo '<a onclick=hrefCandidature(\"' . str_replace(" ", "&nbsp;", $club['NomClub']) . '\",' . $club['IdClub'] . ');>S\'inscrire</a>");}';
-						echo '});'; ?>
-						}
+						Marqueur_bdd= L.marker([<?php echo $club['latitude']; ?>, <?php echo $club['longitude']; ?>]).addTo(map).bindPopup("<?php echo $club['NomClub'] . '<br> Age minimal : ' . $club['age'] . '<br> Adresse : ' . $club['Adresse'] . '<br> Complet : ';
+						if($club['Nbr_adh_max'] - $club['Nbr_adh'] <= 0)
+							echo'Oui <br>';
+						else
+							echo'Non <br>';
+						echo '<a onclick=hrefCandidature(\"' . str_replace(" ", "&nbsp;", $club['NomClub']) . '\",' . $club['IdClub'] . ');>S\'inscrire</a>'; 
+						?>");
 					}
-				<?php
-				endforeach;
-			?>
+				<?php endforeach; ?>
 		}
 
 		function hrefCandidature(NomClub, IdClub){	
@@ -123,6 +97,18 @@
 			[ageMin, ageMax] = ageslimites;
 			Les_marqueurs = [];
 			ajaxPlacerMarqueurs(ageMin, ageMax);
+		});
+
+		document.getElementById("filtreClubComplet").addEventListener("change", function(event) {
+			//Suppression de tous les marqueurs de la carte
+			map.eachLayer(function(layer) {
+				if (layer instanceof L.Marker) 
+					if(layer.options.opacity == 1 && layer.getPopup().getContent().includes("Complet : Oui"))
+						layer.setOpacity(0);
+					else	
+						layer.setOpacity(1);
+				
+			});
 		});
 
 		ajaxPlacerMarqueurs(0, 100);

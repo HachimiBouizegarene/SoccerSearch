@@ -2,6 +2,7 @@
 $css = '<link rel="stylesheet" href="css/cgu.css">';
 $pageName = 'Conditions Générales d\'Utilisation - SoccerSearch';
 require 'ressources/header.php';
+require 'actions_php/bdd.php';
 ?>
 
 <body>

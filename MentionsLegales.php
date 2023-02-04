@@ -2,6 +2,7 @@
 $css = '<link rel="stylesheet" href="css/mentionslegales.css">';
 $pageName = 'Mentions légales - SoccerSearch';
 require 'ressources/header.php';
+require 'actions_php/bdd.php';
 ?>
 
 <body>

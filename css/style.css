@@ -142,6 +142,10 @@ body{
 	flex-basis:60%;
 	color : white;
 	justify-content: center;
+	font-family: 'Helvetica';
+}
+
+label{
 }
 
 #filtre_txt{

@@ -16,7 +16,7 @@
     <label class="password">Mot de passe</label>
         <input type="password" name="password" placeholder="Mot de passe">
     <label class="validate">Envoyer</label>
-	<div class="submit"><div id="txt"><input type="submit" name="validate"></div></div>
+		<div class="submit"><div id="txt"><input type="submit" name="validate"></div></div>
     <label class="err"><?php if(isset($errorMSG)){echo '<span class="errorMSG">'.$errorMSG.'</span>';} ?></label>
 	<label class="creat">Si vous n'avez pas de compte : <a href="inscription.php"> Crée un compte</a></label>
 </form>

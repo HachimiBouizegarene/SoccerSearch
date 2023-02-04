@@ -28,14 +28,14 @@ if(isset($_POST['validate'])){ //si bouton valider est cliqué
                                 $insertUser->execute();
 
                                 //requette de récupération de l'id de l'utilisateur
-                                $getuserInfos = $bdd->prepare('SELECT idUser FROM utilisateurs WHERE username = :username');
+                                $getuserInfos = $bdd->prepare('SELECT IdUser FROM utilisateurs WHERE username = :username');
                                 $getuserInfos->bindParam(':username', $username);
                                 $getuserInfos->execute();
                                 $userInfos = $getuserInfos->fetch();
                                 
                                 //initialise les variables de session
                                 $_SESSION['logged'] = true;
-                                $_SESSION['idUser'] = $userInfos['idUser'];
+                                $_SESSION['IdUser'] = $userInfos['IdUser'];
                                 $_SESSION['username'] = $username;
 
                                 header('Location: index.php');
